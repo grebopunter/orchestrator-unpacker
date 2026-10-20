@@ -32,7 +32,7 @@ import struct
 import sys
 import wave
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 
 # --------------------------------------------------------------------------
@@ -40,6 +40,10 @@ __version__ = "1.1.0"
 
 class OrcError(Exception):
     pass
+
+
+class Cancelled(Exception):
+    """Raised by a progress callback to stop a conversion part-way."""
 
 
 def read_vlq(buf, pos):
@@ -427,7 +431,14 @@ def build_rpp(song, tmap, midi_tracks, audio_items, pool_rate):
 # --------------------------------------------------------------------------
 # one file
 
-def convert(path, out_root=None, make_rpp=True):
+def convert(path, out_root=None, make_rpp=True, progress=None):
+    """Convert one .orc file.  progress, if given, is called with a
+    fraction 0..1 as work proceeds; it may raise Cancelled to stop."""
+    def tick(x):
+        if progress:
+            progress(x)
+
+    tick(0.0)
     song = os.path.splitext(os.path.basename(path))[0]
     out_dir = os.path.join(out_root or os.path.dirname(os.path.abspath(path)),
                            song)
@@ -451,6 +462,7 @@ def convert(path, out_root=None, make_rpp=True):
     _fmt, division, tracks = parse_midi(midi_bytes)
     tmap = TempoMap(tracks, division)
     pool = parse_audio(data, wav[1], wav[2], warnings) if wav else None
+    tick(0.05)
 
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, song + ".mid"), "wb") as f:
@@ -488,6 +500,7 @@ def convert(path, out_root=None, make_rpp=True):
                 continue
             label = "audio track '%s'" % name
             pcm = render_track(pool, pool.tracks[k], warnings, label)
+            tick(0.05 + 0.9 * (k + 1) / max(1, len(audio_tracks)))
             base = "%02d %s" % (order, safe_name(name, "Audio"))
             fname = base + ".wav"
             n = 2
@@ -547,6 +560,7 @@ def convert(path, out_root=None, make_rpp=True):
     with open(os.path.join(out_dir, "conversion-report.txt"), "w",
               encoding="utf-8") as f:
         f.write(text)
+    tick(1.0)
     return out_dir, warnings, text
 
 
