@@ -9,7 +9,7 @@ import os
 import sys
 
 from PySide6.QtCore import QObject, QSettings, Qt, QThread, Signal, Slot
-from PySide6.QtGui import QAction, QFont, QKeySequence
+from PySide6.QtGui import QAction, QFont, QIcon, QKeySequence
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QButtonGroup, QCheckBox, QDialog,
     QFileDialog, QHBoxLayout, QHeaderView, QLabel, QLineEdit, QMainWindow,
@@ -20,6 +20,12 @@ from PySide6.QtWidgets import (
 import dop_extract as dx
 
 APP_NAME = "DOP Extract"
+
+
+def resource(name):
+    """Path to a bundled file, from source or from the PyInstaller build."""
+    base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base, "assets", name)
 
 WAITING, CONVERTING, OK, WARN, FAILED, STOPPED = (
     "Waiting", "Converting", "OK", "Warnings", "Failed", "Stopped")
@@ -508,8 +514,16 @@ class MainWindow(QMainWindow):
 
 
 def main():
+    if sys.platform.startswith("win"):
+        try:  # own taskbar icon/group even when run from python.exe
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+                "grebopunter.DOPExtract")
+        except (AttributeError, OSError):
+            pass
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
+    app.setWindowIcon(QIcon(resource("dop-extract.png")))
     win = MainWindow()
     win.add_paths([a for a in sys.argv[1:] if os.path.exists(a)])
     win.show()
