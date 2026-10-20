@@ -1,4 +1,4 @@
-# dop-extract
+# orchestrator-unpacker
 
 Converts **Voyetra / Turtle Beach Digital Orchestrator Plus / Pro** project
 files (`.orc`) into plain MIDI and WAV files, plus a **REAPER** project that
