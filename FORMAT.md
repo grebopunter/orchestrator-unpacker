@@ -35,9 +35,10 @@ Track settings are stored as sequencer-specific meta events
 |------|---------------------------------------------------|
 | 0x01 | track number (2 bytes; not always contiguous)     |
 | 0x14 | `01` = this track is a digital-audio track        |
+| 0x03 | `01` = track muted (seen on audio tracks only)   |
 | 0x08 | volume, 0–127 (new audio tracks start at 64)      |
 | 0x09 | pan, 0 = left, 64 = centre, 127 = right           |
-| 0x02, 0x03, 0x04, 0x07, 0x0a, 0x0b, 0x15 | not decoded |
+| 0x02, 0x04, 0x07, 0x0a, 0x0b, 0x15 | not decoded |
 | 0x06, 0x0c, 0x0d, 0x1d | on track 0 only; not decoded          |
 
 Bank select (CC0/CC32) and program changes are ordinary channel events and
@@ -98,6 +99,13 @@ How this was checked:
   zero offset (up to r = 1.000) when laid out this way.
 - Loop lengths fall exactly on the beat at the song's MIDI tempo; for
   example, 21,168 frames is one beat at 125 BPM.
+- Against recordings of Voyetra's demo songs played in Digital Orchestrator
+  (DEMOSONG, DEMO_X), clips land where they are heard; reading `(a, b)` as
+  "a frames of silence, then block b" instead puts them about a second late.
+
+The mute flag (0x03) was identified from user projects: it marks the raw
+loop/source tracks whose material was copied onto the arranged tracks,
+and never appears in the demo songs, where every track is heard.
 
 ## Not yet decoded
 

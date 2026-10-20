@@ -49,7 +49,7 @@ def build_orc():
     aud1 = mtrk([voy(0x01, b"\x00\x01"), voy(0x14, b"\x01"),
                  voy(0x08, b"\x20"), voy(0x09, b"\x00"),
                  meta(0, 0x03, b"left")])
-    aud2 = mtrk([voy(0x01, b"\x00\x02"), voy(0x14, b"\x01"),
+    aud2 = mtrk([voy(0x01, b"\x00\x02"), voy(0x03, b"\x01"), voy(0x14, b"\x01"),
                  meta(0, 0x03, b"right")])
     midi = (b"MThd" + struct.pack(">IHHH", 6, 1, 4, 480)
             + conductor + piano + aud1 + aud2)
@@ -133,6 +133,10 @@ class ConvertTest(unittest.TestCase):
         self.assertIn("PT 0 120 1 262148", rpp)      # tempo map with 4/4
         self.assertIn("PT 1 100 1", rpp)             # 960 ticks at 120 = 1 s
         self.assertLess(rpp.index('"piano"'), rpp.index('"left"'))
+        right = rpp[rpp.index('NAME "right"'):]
+        left = rpp[rpp.index('NAME "left"'):rpp.index('NAME "right"')]
+        self.assertIn("MUTESOLO 1 0 0", right)       # muted in DOP
+        self.assertNotIn("MUTESOLO", left)
 
     def test_folder_batch(self):
         with tempfile.TemporaryDirectory() as out:

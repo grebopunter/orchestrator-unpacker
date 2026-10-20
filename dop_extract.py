@@ -8,7 +8,9 @@ For every input file  song.orc  a folder  song/  is written containing:
                             (bank select and program changes kept as-is)
     NN <track name>.wav     one WAV per audio track, rendered to full song
                             time (clips placed, gaps filled with silence),
-                            so every file lines up when dropped in at 0:00
+                            so every file lines up when dropped in at 0:00;
+                            tracks muted in Digital Orchestrator are
+                            extracted too and come into REAPER muted
     song.RPP                a REAPER project with the tempo map, every MIDI
                             track (no instruments loaded) and every audio
                             track with its volume and pan
@@ -30,7 +32,7 @@ import struct
 import sys
 import wave
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 # --------------------------------------------------------------------------
@@ -111,6 +113,10 @@ class MidiTrack:
     @property
     def is_audio(self):
         return self.voyetra.get(0x14, b"\x00")[:1] == b"\x01"
+
+    @property
+    def muted(self):
+        return self.voyetra.get(0x03, b"\x00")[-1:] == b"\x01"
 
     def setting(self, key):
         v = self.voyetra.get(key)
@@ -402,6 +408,8 @@ def build_rpp(song, tmap, midi_tracks, audio_items, pool_rate):
         else:
             L.append("    VOLPAN %s %s -1 -1 1" % (fmt_num(data["gain"]),
                                                   fmt_num(data["pan"])))
+            if data["muted"]:
+                L.append("    MUTESOLO 1 0 0")
             if data["length"] > 0:
                 L += ["    <ITEM",
                       "      POSITION 0",
@@ -494,12 +502,13 @@ def convert(path, out_root=None, make_rpp=True):
             audio_items.append(("audio", {
                 "order": order, "name": name, "file": fname,
                 "length": seconds, "gain": volume_gain(vol),
-                "pan": pan_value(pan)}))
+                "pan": pan_value(pan), "muted": tr.muted}))
             report.append("  %2d  audio  %-24s %7.1f s  %4d clip entries"
-                          "  vol %s  pan %s  -> %s" % (
+                          "  vol %s  pan %s%s  -> %s" % (
                               order, name, seconds, len(pool.tracks[k]),
                               vol if vol is not None else "-",
-                              pan if pan is not None else "-", fname))
+                              pan if pan is not None else "-",
+                              "  MUTED" if tr.muted else "", fname))
         else:
             chans = sorted({ev[0] & 0x0F for _, ev in tr.events
                             if ev[0] < 0xF0})

@@ -18,10 +18,12 @@ For `song.orc`, a folder `song/` next to it containing:
 |------|------------|
 | `song.mid` | the MIDI exactly as stored, with bank select and program changes intact |
 | `NN name.wav` | one WAV per audio track (NN = track number), rendered from 0:00 with every clip in place, so all files line up when dropped in at the start |
-| `song.RPP` | a REAPER project: tempo map, named MIDI tracks on their original channels (no instruments loaded), audio tracks with their volume and pan |
+| `song.RPP` | a REAPER project: tempo map, named MIDI tracks on their original channels (no instruments loaded), audio tracks with their volume, pan and mute |
 | `conversion-report.txt` | tracks found, lengths, settings and any warnings |
 
-WAVs keep the original sample rate and bit depth.  Because loops are
+WAVs keep the original sample rate and bit depth.  Tracks that were muted
+in Digital Orchestrator (often the raw loops an arrangement was built from)
+are extracted too, and come into REAPER muted.  Because loops are
 written out in full, a heavily looped song can produce large files.
 
 ## Use
