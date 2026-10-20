@@ -26,7 +26,25 @@ in Digital Orchestrator (often the raw loops an arrangement was built from)
 are extracted too, and come into REAPER muted.  Because loops are
 written out in full, a heavily looped song can produce large files.
 
-## Use
+## Desktop app
+
+`DOP Extract` is a window for the same conversion:
+
+- drag `.orc` files or folders onto it, or use Add files / Add folder
+  (with an option to include subfolders);
+- put the output next to each `.orc` file or in one folder you choose;
+- make the full conversion or just the `.mid` and WAVs;
+- watch each file's status and progress, then use its Report, Folder and
+  REAPER buttons (REAPER opens the `.RPP`);
+- conversions run in the background and can be stopped; your folders and
+  options are remembered.
+
+Run it from source with `pip install -r requirements-gui.txt` then
+`python dop_extract_gui.py`, or build a standalone Windows app with
+`python build_exe.py`.  The build is the whole `dist/DOP Extract/` folder;
+`DOP Extract.exe` inside it needs the files next to it.
+
+## Command line
 
 Python 3.8 or newer; nothing to install.
 
@@ -59,7 +77,8 @@ python -m unittest discover tests
 ```
 
 The tests build a synthetic `.orc` file, so no copyrighted songs are
-needed.
+needed.  The app tests run offscreen and are skipped if PySide6 isn't
+installed.
 
 ## License
 
