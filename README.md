@@ -10,6 +10,8 @@ is stored as one cut-up stream with a private clip list.  No other tool
 reads that clip list, so recordings come out scrambled or not at all.
 dop-extract decodes it (see [FORMAT.md](FORMAT.md)).
 
+![DOP Extract](docs/screenshot.png)
+
 ## What you get
 
 For `song.orc`, a folder `song/` next to it containing:
@@ -28,6 +30,10 @@ written out in full, a heavily looped song can produce large files.
 
 ## Desktop app
 
+**Download:** grab `DOP-Extract-<version>-windows.zip` from the Releases
+page, unzip it anywhere and run `DOP Extract\DOP Extract.exe`.  No Python
+needed.
+
 `DOP Extract` is a window for the same conversion:
 
 - drag `.orc` files or folders onto it, or use Add files / Add folder
@@ -41,8 +47,8 @@ written out in full, a heavily looped song can produce large files.
 
 Run it from source with `pip install -r requirements-gui.txt` then
 `python dop_extract_gui.py`, or build a standalone Windows app with
-`python build_exe.py`.  The build is the whole `dist/DOP Extract/` folder;
-`DOP Extract.exe` inside it needs the files next to it.
+`python build_exe.py`, which also makes the release zip.  The app is the
+whole `DOP Extract` folder; the `.exe` inside it needs the files next to it.
 
 ## Command line
 
