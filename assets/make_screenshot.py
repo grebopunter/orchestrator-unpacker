@@ -28,6 +28,7 @@ while w.busy() and time.time() - t < 120:
     app.processEvents()
     time.sleep(0.01)
 w.table.clearSelection()
+w.out_edit.setText(r"D:\Music\Converted")  # neutral path for the picture
 app.processEvents()
 dest = os.path.join(os.path.dirname(here), "docs", "screenshot.png")
 os.makedirs(os.path.dirname(dest), exist_ok=True)
